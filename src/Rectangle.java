@@ -21,6 +21,7 @@ public class Rectangle {
         this.top = top;
         this.left = left;
     }
+    
 
     //Конструктор, который принимает как параметр другой объект типа Rectangle
 
