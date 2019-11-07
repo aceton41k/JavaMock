@@ -14,7 +14,6 @@ public class Rectangle {
         this.left = left;
     }
 
-
     //Конструктор без параметра высота (берется от ширины, т.к. это квадрат).
     public Rectangle(int top, int left, int width) {
         this.height = width;
