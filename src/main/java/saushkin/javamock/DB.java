@@ -1,15 +1,15 @@
 package saushkin.javamock;
 
-import org.sqlite.JDBC;
+
+import org.postgresql.Driver;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class DB {
     // Константа, в которой хранится адрес подключения
-    private static final String CON_STR = "jdbc:sqlite:C:/soft/SQLiteDatabaseBrowserPortable/Data/javamockdb.db";
+    private static final String CON_STR = "jdbc:postgresql://localhost/javamockdb";
 
     // Используем шаблон одиночка, чтобы не плодить множество
     // экземпляров класса DB
@@ -28,46 +28,49 @@ public class DB {
     private DB() throws SQLException {
         // Регистрируем драйвер, с которым будем работать
         // в нашем случае Sqlite
-        DriverManager.registerDriver(new JDBC());
+        DriverManager.registerDriver(new Driver());
         // Выполняем подключение к базе данных
-        this.connection = DriverManager.getConnection(CON_STR);
+        this.connection = DriverManager.getConnection(CON_STR, "javamock", "javamock");
     }
 
     public List<User> getUsers() throws SQLException {
         // Statement используется для того, чтобы выполнить sql-запрос
- Statement statement = this.connection.createStatement();
-            // В данный список будем загружать наши продукты, полученные из БД
-            List<User> users = new ArrayList<User>();
-            // В resultSet будет храниться результат нашего запроса,
-            // который выполняется командой statement.executeQuery()
-            ResultSet resultSet = statement.executeQuery("SELECT id, first_name, last_name, middle_name, role FROM users");
-            // Проходимся по нашему resultSet и заносим данные в products
-            while (resultSet.next()) {
-                users.add(new User(resultSet.getInt("id"),
-                        resultSet.getString("first_name"),
-                        resultSet.getString("last_name"),
-                        resultSet.getString("middle_name"),
-                        resultSet.getString("role")));
-            }
-            // Возвращаем наш список
-            return users;
+        Statement statement = this.connection.createStatement();
+        // В данный список будем загружать наши продукты, полученные из БД
+        List<User> users = new ArrayList<User>();
+        // В resultSet будет храниться результат нашего запроса,
+        // который выполняется командой statement.executeQuery()
+        ResultSet resultSet = statement.executeQuery("SELECT id, first_name, last_name, middle_name, role_id FROM users");
+        // Проходимся по нашему resultSet и заносим данные в products
+        while (resultSet.next()) {
+            users.add(new User(resultSet.getInt("id"),
+                    resultSet.getString("first_name"),
+                    resultSet.getString("last_name"),
+                    resultSet.getString("middle_name"),
+                    resultSet.getString("role_id")));
+        }
+        // Возвращаем наш список
+        return users;
     }
 
-    public void addUser(User user) {
+    public int addUser(String firstName, String lastName, String middleName, int role_id) throws SQLException {
         // Создадим подготовленное выражение, чтобы избежать SQL-инъекций
-        try (PreparedStatement statement = this.connection.prepareStatement(
-                "INSERT INTO users(`first_name`, `last_name`, `middle_name`, `role`) " +
-                        "VALUES(?, ?, ?, ?)")) {
-            statement.setObject(1, user.firstName);
-            statement.setObject(2, user.lastName);
-            statement.setObject(3, user.middleName);
-            statement.setObject(4, user.role);
-            // Выполняем запрос
-            statement.execute();
-            System.out.println("User has "+user.firstName+" "+user.middleName+" "+user.lastName+" been added successfully");
-        } catch (SQLException e) {
-            e.printStackTrace();
+        PreparedStatement statement = this.connection.prepareStatement(
+                "INSERT INTO users(first_name, last_name, middle_name, role_id) " +
+                        "VALUES(?, ?, ?, ?) RETURNING id");
+        statement.setObject(1, firstName);
+        statement.setObject(2, lastName);
+        statement.setObject(3, middleName);
+        statement.setObject(4, role_id);
+        // Выполняем запрос
+        ResultSet rs = statement.executeQuery();
+        int id = 0;
+        while (rs.next()) {
+            id = rs.getInt("id");
         }
+
+        //System.out.println("User "+firstName+" "+middleName+" "+lastName+" has been added successfully");
+        return id;
     }
 
 }

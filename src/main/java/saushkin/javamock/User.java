@@ -5,14 +5,14 @@ public class User {
     String lastName;
     String middleName;
     double id;
-    String role;
+    String role_id;
 
-    public User(int id, String firstName, String lastName, String middleName, String role) {
+    public User(int id, String firstName, String lastName, String middleName, String role_id) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.middleName = middleName;
-        this.role = role;
+        this.role_id = role_id;
     };
 
     public String getFirstName() {
@@ -47,11 +47,11 @@ public class User {
         this.id = id;
     }
 
-    public String getRole() {
-        return role;
+    public String getRole_id() {
+        return role_id;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setRole_id(String role_id) {
+        this.role_id = role_id;
     }
 }

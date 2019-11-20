@@ -5,15 +5,9 @@ import java.util.List;
 public class JsonResponse {
     String status;
     String message;
-    public List<?> data;
+    List<?> data;
 
     public JsonResponse(String status, String message, List<?> data) {
-        this.status = status;
-        this.message = message;
-        this.data = data;
-    }
-
-    public JsonResponse(String status, String message) {
         this.status = status;
         this.message = message;
         this.data = data;
