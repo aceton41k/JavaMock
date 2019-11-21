@@ -1,11 +1,11 @@
 package saushkin.javamock;
 
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.postgresql.Driver;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class DB {
     // Константа, в которой хранится адрес подключения
@@ -33,17 +33,17 @@ public class DB {
         this.connection = DriverManager.getConnection(CON_STR, "javamock", "javamock");
     }
 
-    public List<User> getUsers() throws SQLException {
+    public JSONArray getUsers() throws SQLException {
         // Statement используется для того, чтобы выполнить sql-запрос
         Statement statement = this.connection.createStatement();
         // В данный список будем загружать наши продукты, полученные из БД
-        List<User> users = new ArrayList<User>();
+        JSONArray users = new JSONArray();
         // В resultSet будет храниться результат нашего запроса,
         // который выполняется командой statement.executeQuery()
         ResultSet resultSet = statement.executeQuery("SELECT id, first_name, last_name, middle_name, role_id FROM users");
         // Проходимся по нашему resultSet и заносим данные в products
         while (resultSet.next()) {
-            users.add(new User(resultSet.getInt("id"),
+            users.put(new User(resultSet.getInt("id"),
                     resultSet.getString("first_name"),
                     resultSet.getString("last_name"),
                     resultSet.getString("middle_name"),
@@ -73,4 +73,17 @@ public class DB {
         return id;
     }
 
+    public JSONObject getUser(String id) throws SQLException {
+        Statement statement = this.connection.createStatement();
+        JSONObject user = new JSONObject();
+        ResultSet resultSet = statement.executeQuery("SELECT id, first_name, last_name, middle_name, role_id FROM users WHERE id=" + id);
+        if (resultSet.next()) {
+            user.put("id", resultSet.getInt("id"));
+            user.put("first_name", resultSet.getString("first_name"));
+            user.put("last_name", resultSet.getString("first_name"));
+            user.put("middle_name", resultSet.getString("middle_name"));
+            user.put("role_id", resultSet.getInt("role_id"));
+        }
+        return user;
+    }
 }

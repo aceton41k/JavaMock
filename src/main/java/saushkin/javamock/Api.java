@@ -5,7 +5,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.sql.SQLException;
-import java.util.Arrays;
 
 import static spark.Spark.*;
 
@@ -19,11 +18,25 @@ public class Api {
             DB db = DB.getInstance();
             JsonResponse jsr;
             try {
-                jsr = new JsonResponse("success", "ok", db.getUsers());
+                jsr = new JsonResponse("success", "ok", new JSONObject().put("users", db.getUsers()));
             } catch (SQLException e) {
-                jsr = new JsonResponse("error", e.getMessage(), Arrays.asList(e.getStackTrace()));
+                jsr = new JsonResponse("error", e.getMessage(), new JSONObject().put("Stacktrace", e.getStackTrace()));
             }
-            return new JSONObject(jsr);
+            return jsr;
+        });
+
+        get("/getUser/:id", (req, res) -> {
+            res.type("application/json");
+            String id = req.params(":id");
+//            int id = Integer.getInteger(req.params(":id"));
+            DB db = DB.getInstance();
+            JsonResponse jsr;
+            try {
+                jsr = new JsonResponse("success", "ok", new JSONObject().put("users", db.getUser(id)));
+            } catch (SQLException e) {
+                jsr = new JsonResponse("error", e.getMessage(), new JSONObject().put("Stacktrace", e.getStackTrace()));
+            }
+            return jsr;
         });
 
         post("/addUser", (req, res) -> {
@@ -33,7 +46,7 @@ public class Api {
             try {
                 jso = new JSONObject(req.body());
             } catch (JSONException e) {
-                return new JsonResponse("error", e.getMessage(), Arrays.asList(e.getStackTrace()));
+                return new JsonResponse("error", e.getMessage(), new JSONObject().put("Stacktrace", e.getStackTrace()));
             }
             String firstName = jso.getString("firstName");
             String lastName = jso.getString("lastName");
@@ -41,9 +54,9 @@ public class Api {
             int role_id = jso.getInt("role_id");
             try {
                 int id = db.addUser(firstName, lastName, middleName, role_id);
-                return new JSONObject(new JsonResponse("success", "Successfully added", Arrays.asList(id)));
+                return new JsonResponse("success", "Successfully added", new JSONObject().put("added_id", id));
             } catch (SQLException e) {
-                return new JSONObject(new JsonResponse("error", e.getMessage(), Arrays.asList(e.getStackTrace())));
+                return new JsonResponse("error", e.getMessage(), new JSONObject().put("Stacktrace", e.getStackTrace()));
             }
             //return new JSONObject(jsr);
         });

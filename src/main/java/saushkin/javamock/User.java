@@ -1,18 +1,24 @@
 package saushkin.javamock;
 
-public class User {
+import org.json.JSONObject;
+
+public class User extends JSONObject {
     String firstName;
     String lastName;
     String middleName;
-    double id;
+    int id;
     String role_id;
 
     public User(int id, String firstName, String lastName, String middleName, String role_id) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.middleName = middleName;
-        this.role_id = role_id;
+        this.put("id", id);
+        this.put("firstName", firstName);
+        this.put("lastName", lastName);
+        this.put("middleName", middleName);
+        this.put("role_id", role_id);
+
+//        this.lastName = lastName;
+//        this.middleName = middleName;
+//        this.role_id = role_id;
     };
 
     public String getFirstName() {
@@ -43,7 +49,7 @@ public class User {
         return id;
     }
 
-    public void setId(double id) {
+    public void setId(int id) {
         this.id = id;
     }
 

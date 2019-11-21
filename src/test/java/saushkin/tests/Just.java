@@ -1,6 +1,6 @@
 package saushkin.tests;
 
-public class Just {
+public class Just extends AbstractShit {
     static double dbl = 15;
     protected int age = 100;
     public String name = "Surf";
@@ -11,5 +11,11 @@ public class Just {
 
     public int getAge() {
         return this.age;
+    }
+
+
+    @Override
+    public void getAnything() {
+        super.getAnything();
     }
 }
