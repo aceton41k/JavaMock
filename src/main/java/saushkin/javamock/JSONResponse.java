@@ -2,16 +2,24 @@ package saushkin.javamock;
 
 import org.json.JSONObject;
 
+import java.util.List;
+
 /**
  * Класс для возврата ответа в виде Json со стандартными полями
  */
 
-public class JsonResponse extends JSONObject {
+public class JSONResponse extends JSONObject {
     String status;
     String message;
     JSONObject data;
 
-    public JsonResponse(String status, String message, JSONObject data) {
+    public JSONResponse(String status, String message, List<?> data) {
+        this.put("status", status);
+        this.put("message", message);
+        this.put("data", data);
+    }
+
+    public JSONResponse(String status, String message, JSONObject data) {
         this.put("status", status);
         this.put("message", message);
         this.put("data", data);
@@ -19,6 +27,11 @@ public class JsonResponse extends JSONObject {
 //        this.message = message;
 //        this.data = data;
 //        this.aa = "aa";
+    }
+
+    public JSONResponse(String status, String message) {
+        this.put("status", status);
+        this.put("message", message);
     }
 
     public String getStatus() {

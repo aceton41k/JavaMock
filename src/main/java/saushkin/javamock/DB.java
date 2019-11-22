@@ -4,9 +4,11 @@ package saushkin.javamock;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.postgresql.Driver;
+import saushkin.javamock.model.User;
 
 import java.sql.*;
 
+@Deprecated
 public class DB {
     // Константа, в которой хранится адрес подключения
     private static final String CON_STR = "jdbc:postgresql://localhost/javamockdb";
@@ -43,11 +45,10 @@ public class DB {
         ResultSet resultSet = statement.executeQuery("SELECT id, first_name, last_name, middle_name, role_id FROM users");
         // Проходимся по нашему resultSet и заносим данные в products
         while (resultSet.next()) {
-            users.put(new User(resultSet.getInt("id"),
-                    resultSet.getString("first_name"),
+            users.put(new User(resultSet.getString("first_name"),
                     resultSet.getString("last_name"),
                     resultSet.getString("middle_name"),
-                    resultSet.getString("role_id")));
+                    resultSet.getInt("role_id")));
         }
         // Возвращаем наш список
         return users;

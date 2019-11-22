@@ -3,6 +3,8 @@ package saushkin.javamock;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import saushkin.javamock.model.User;
+import saushkin.javamock.service.UserService;
 
 import java.sql.SQLException;
 
@@ -10,55 +12,50 @@ import static spark.Spark.*;
 
 public class Api {
 
-    public static void start() throws SQLException {
 
+    public static void start() throws SQLException {
+        UserService us = new UserService();
         port(8080);
         get("/getUsers", (req, res) -> {
-            res.type("application/json");
-            DB db = DB.getInstance();
-            JsonResponse jsr;
-            try {
-                jsr = new JsonResponse("success", "ok", new JSONObject().put("users", db.getUsers()));
-            } catch (SQLException e) {
-                jsr = new JsonResponse("error", e.getMessage(), new JSONObject().put("Stacktrace", e.getStackTrace()));
-            }
-            return jsr;
+            res.type(ContentType.JSON);
+            return new JSONResponse("success", "ok", us.findAllUsers());
         });
 
         get("/getUser/:id", (req, res) -> {
-            res.type("application/json");
-            String id = req.params(":id");
-//            int id = Integer.getInteger(req.params(":id"));
-            DB db = DB.getInstance();
-            JsonResponse jsr;
-            try {
-                jsr = new JsonResponse("success", "ok", new JSONObject().put("users", db.getUser(id)));
-            } catch (SQLException e) {
-                jsr = new JsonResponse("error", e.getMessage(), new JSONObject().put("Stacktrace", e.getStackTrace()));
-            }
-            return jsr;
+            res.type(ContentType.JSON);
+            int id = Integer.parseInt(req.params(":id"));
+            return new JSONResponse("success", "ok", new JSONObject().put("user", new JSONObject(us.getUser(id))));
         });
 
         post("/addUser", (req, res) -> {
-            res.type("application/json");
-            DB db = DB.getInstance();
+            res.type(ContentType.JSON);
             JSONObject jso;
             try {
                 jso = new JSONObject(req.body());
             } catch (JSONException e) {
-                return new JsonResponse("error", e.getMessage(), new JSONObject().put("Stacktrace", e.getStackTrace()));
+                return new JSONResponse("error", e.getMessage(), new JSONObject().put("Stacktrace", e.getStackTrace()));
             }
             String firstName = jso.getString("firstName");
             String lastName = jso.getString("lastName");
             String middleName = jso.getString("middleName");
             int role_id = jso.getInt("role_id");
-            try {
-                int id = db.addUser(firstName, lastName, middleName, role_id);
-                return new JsonResponse("success", "Successfully added", new JSONObject().put("added_id", id));
-            } catch (SQLException e) {
-                return new JsonResponse("error", e.getMessage(), new JSONObject().put("Stacktrace", e.getStackTrace()));
-            }
+            int id = us.addUser(new User(firstName, lastName, middleName, role_id));
+            return new JSONResponse("success", "Successfully added", new JSONObject().put("added_id", id));
             //return new JSONObject(jsr);
+        });
+
+        delete("/delUser", (req, res) -> {
+            res.type(ContentType.JSON);
+            JSONObject jso;
+            try {
+                jso = new JSONObject(req.body());
+            } catch (JSONException e) {
+                return new JSONResponse("error", e.getMessage(), new JSONObject().put("Stacktrace", e.getStackTrace()));
+            }
+            int id = jso.getInt("id");
+            if (us.deleteUser(id)) {
+                return new JSONResponse("success", "User id=" + id + " deleted");
+            } else return new JSONResponse("fail", "User id=" + id + " not found");
         });
 
 //        get("/hello", (req, res) -> {
