@@ -7,6 +7,7 @@ import saushkin.javamock.model.User;
 import saushkin.javamock.service.UserService;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import static spark.Spark.*;
 
@@ -18,7 +19,8 @@ public class Api {
         port(8080);
         get("/getUsers", (req, res) -> {
             res.type(ContentType.JSON);
-            return new JSONResponse("success", "ok", us.findAllUsers());
+            List users = us.findAllUsers();
+            return new JSONResponse("success", "ok", new JSONObject().put("total", users.size()).put("users", users));
         });
 
         get("/getUser/:id", (req, res) -> {
